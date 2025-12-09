@@ -14,7 +14,7 @@ This task aggregates financial metrics from the `thelook_ecommerce` dataset to t
 * **Revenue:** Calculated as the sum of `sale_price`.
 * **Metric Logic:**
     * **Orders:** Count of distinct `order_id`.
-    * **Units:** Count of distinct line item IDs (`oi.id`).
+    * **Units:** Count of distinct line item IDs (`id`).
     * **AOV:** Revenue / Total Orders.
     * **MoM Growth:** Calculated using previous month's revenue (Lag Window Function).
 
