@@ -20,3 +20,29 @@ This task aggregates financial metrics from the `thelook_ecommerce` dataset to t
 
 > **Crucial Definition:** A "Completed sale" is strictly filtered where:
 > `status = 'Complete'` **AND** `returned_at IS NULL`
+
+------------------------------
+
+### Task B: New vs. Returning Mix
+
+**Overview**
+This task analyzes customer retention by distinguishing between acquisition (New) and retention (Returning) behavior. It calculates the revenue mix and customer counts for every month.
+
+**Dataset Sources**
+* `bigquery-public-data.thelook_ecommerce.order_items`
+* `bigquery-public-data.thelook_ecommerce.orders`
+
+**Assumptions & Logic**
+1.  **Identify Activation Date:** Calculate the `MIN(created_at)` for every user to find their specific "First Order Month."
+2.  **Tag Monthly Activity:** Join the sales data with the user's activation date and apply the following logic:
+    * **New Customer:** `Current_Month` == `Activation_Month`
+    * **Returning Customer:** `Current_Month` > `Activation_Month`
+3.  **Aggregate:** Group by month to sum revenue and count distinct users based on these tags.
+
+**Key Definitions**
+* **Active Customer:** Any user with a "Completed" order in the reporting month.
+* **New:** A customer whose first-ever completed order occurred in the current reporting month.
+* **Returning:** A customer active in the current month who had their first completed order in a *previous* month.
+
+
+  
