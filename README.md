@@ -70,3 +70,26 @@ This task calculates churn rates by observing customer behavior over a specific 
 > To avoid misleading "100% churn" stats, we must exclude recent months where the 3-month window hasn't fully elapsed.
 >
 > *Filter Applied:* `activity_month < DATE_SUB(CURRENT_DATE(), INTERVAL 4 MONTH)`
+
+-------------------------------
+
+### Optional Stretch: Cohort Retention Heatmap
+
+**Overview**
+This task moves beyond aggregate churn rates to build a **Cohort-Based Retention Heatmap**. This visualization tracks specific groups of users (Cohorts) over time to see how quickly retention degrades for each acquisition month.
+
+**Dataset Sources**
+* `bigquery-public-data.thelook_ecommerce.orders`
+
+**Assumptions & Logic**
+1.  **Define Cohort (Rows):** Determine the **First Purchase Month** for every user.
+2.  **Calculate Lifecycle Stage (Columns):** For every subsequent purchase, calculate the "Month Index" (time elapsed since joining).
+    * *Formula:* `DATE_DIFF(Purchase_Month, Cohort_Month, MONTH)`
+    * *Month 0:* The acquisition month (typically 100% retention).
+    * *Month 1:* The first full month after joining.
+3.  **Aggregate & Rate:** Count distinct users for every `(Cohort, Month_Index)` pair and divide by the original cohort size.
+
+**Visualization Structure**
+* **Rows:** Cohort Month (e.g., Jan 2022, Feb 2022).
+* **Columns:** Months Since First Purchase (0, 1, 2, ... 12+).
+* **Values:** Retention Rate % (visualized by color intensity).
