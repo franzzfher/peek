@@ -44,5 +44,37 @@ This task analyzes customer retention by distinguishing between acquisition (New
 * **New:** A customer whose first-ever completed order occurred in the current reporting month.
 * **Returning:** A customer active in the current month who had their first completed order in a *previous* month.
 
+-------------------------------
 
+### Task C: 90-Day Churn Analysis
+
+**Overview**
+This task calculates the churn rate based on a fixed time window. It identifies users active in a specific month and checks if they failed to return within the subsequent 90 days.
+
+**Dataset Sources**
+* `bigquery-public-data.thelook_ecommerce.order_items`
+* `bigquery-public-data.thelook_ecommerce.orders`
+
+**Assumptions & Logic**
+Defining churn in SQL requires a look-ahead approach. We define a cohort and then observe their behavior in a future window.
+
+1.  **Define Cohort (Month M):** Identify every user who was "Active" (placed $\ge$ 1 completed order) in a specific calendar month.
+2.  **Define Window (M + 90 Days):** For those specific users, check for *any* completed purchase in the subsequent 90-day period.
+    * *Window Start:* `Month M + 1 Month`
+    * *Window End:* `Month M + 1 Month + 90 Days`
+3.  **Classify Status:**
+    * **Retained:** Future Order Count $\ge$ 1
+    * **Churned:** Future Order Count = 0
+
+**Crucial Technical Constraint: "The Future Gap"**
+> **Warning:** You cannot calculate 90-day churn for the most recent 3 months. The full 90-day window has not elapsed yet. Including these months would result in a misleading **100% churn rate**.
+>
+> *Filter Applied:* `activity_month < DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)`
+
+**Metric Definition**
+The Churn Rate is calculated as:
+$$\text{Churn Rate} = \frac{\text{Users with 0 future orders}}{\text{Total Active Users in Cohort}} \times 100$$
   
+
+
+
