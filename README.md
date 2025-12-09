@@ -46,35 +46,27 @@ This task analyzes customer retention by distinguishing between acquisition (New
 
 -------------------------------
 
-### Task C: 90-Day Churn Analysis
+### Task C: 90-Day Churn (Calendar Window Method)
 
 **Overview**
-This task calculates the churn rate based on a fixed time window. It identifies users active in a specific month and checks if they failed to return within the subsequent 90 days.
+This task calculates churn rates by observing customer behavior over a specific 3-month calendar window (e.g., Feb–Mar–Apr) rather than a fixed 90-day count. This ensures alignment with calendar boundaries regardless of month length (28, 30, or 31 days).
 
 **Dataset Sources**
 * `bigquery-public-data.thelook_ecommerce.order_items`
 * `bigquery-public-data.thelook_ecommerce.orders`
 
 **Assumptions & Logic**
-Defining churn in SQL requires a look-ahead approach. We define a cohort and then observe their behavior in a future window.
+1.  **Define Cohort (Month M):** Identify every user who was "Active" in a specific month.
+2.  **Define Window (Next 3 Months):** For these users, check for *any* completed purchase in the subsequent 3 full calendar months.
+    * *Start:* 1st of the next month (`INTERVAL 1 MONTH`)
+    * *End:* 1st of the month 4 months out (`INTERVAL 4 MONTH`, exclusive)
+3.  **Strict Retention Check:** A user is only "Retained" if their future order is **Completed** and not returned.
 
-1.  **Define Cohort (Month M):** Identify every user who was "Active" (placed $\ge$ 1 completed order) in a specific calendar month.
-2.  **Define Window (M + 90 Days):** For those specific users, check for *any* completed purchase in the subsequent 90-day period.
-    * *Window Start:* `Month M + 1 Month`
-    * *Window End:* `Month M + 1 Month + 90 Days`
-3.  **Classify Status:**
-    * **Retained:** Future Order Count $\ge$ 1
-    * **Churned:** Future Order Count = 0
+**Classifications**
+* **Retained:** User placed $\ge$ 1 completed order in the 3-month window.
+* **Churned:** User placed 0 completed orders in the 3-month window.
 
-**Technical Constraint:**
-> **Warning:** You cannot calculate 90-day churn for the most recent 3 months. The full 90-day window has not elapsed yet. Including these months would result in a misleading **100% churn rate**.
+> **Technical Constraint:**
+> To avoid misleading "100% churn" stats, we must exclude recent months where the 3-month window hasn't fully elapsed.
 >
-> *Filter Applied:* `activity_month < DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)`
-
-**Metric Definition**
-The Churn Rate is calculated as:
-$$\text{Churn Rate} = \frac{\text{Users with 0 future orders}}{\text{Total Active Users in Cohort}} \times 100$$
-  
-
-
-
+> *Filter Applied:* `activity_month < DATE_SUB(CURRENT_DATE(), INTERVAL 4 MONTH)`
