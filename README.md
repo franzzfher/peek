@@ -1,4 +1,4 @@
-# peek
+# PEEK
 
 ### Task A: Monthly Financials
 
