@@ -66,7 +66,7 @@ Defining churn in SQL requires a look-ahead approach. We define a cohort and the
     * **Retained:** Future Order Count $\ge$ 1
     * **Churned:** Future Order Count = 0
 
-**Crucial Technical Constraint: "The Future Gap"**
+**Technical Constraint:**
 > **Warning:** You cannot calculate 90-day churn for the most recent 3 months. The full 90-day window has not elapsed yet. Including these months would result in a misleading **100% churn rate**.
 >
 > *Filter Applied:* `activity_month < DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)`
