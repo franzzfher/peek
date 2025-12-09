@@ -1,14 +1,22 @@
 # peek
 
-### Task 1
+### Task A: Monthly Financials
 
-**Table Overviews**
-* `order_items`: Contains revenue and status data.
-* `users`: Contains demographic data.
+**Overview**
+This task aggregates financial metrics from the `thelook_ecommerce` dataset to track monthly performance.
 
-> **Crucial Definition:** A "Completed sale" is strictly defined as:
-> `order_items.status = 'Complete'` AND `returned_at IS NULL`
+**Dataset Sources**
+* `bigquery-public-data.thelook_ecommerce.order_items`
+* `bigquery-public-data.thelook_ecommerce.orders`
 
-**Key Metrics**
-* **Revenue:** Calculated as `SUM(sale_price)`.
-* **Cost of Goods Sold (COGS):** Derived from `inventory_items.cost`.
+**Assumptions & Logic**
+* **Timeframe:** All time (aggregated by month).
+* **Revenue:** Calculated as the sum of `sale_price`.
+* **Metric Logic:**
+    * **Orders:** Count of distinct `order_id`.
+    * **Units:** Count of distinct line item IDs (`oi.id`).
+    * **AOV:** Revenue / Total Orders.
+    * **MoM Growth:** Calculated using previous month's revenue (Lag Window Function).
+
+> **Crucial Definition:** A "Completed sale" is strictly filtered where:
+> `status = 'Complete'` **AND** `returned_at IS NULL`
