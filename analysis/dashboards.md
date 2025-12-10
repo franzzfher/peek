@@ -12,3 +12,6 @@
 
 <img width="2032" height="1161" alt="image" src="https://github.com/user-attachments/assets/ade824ac-7213-46a9-be61-8df98f68ba5b" />
 
+* [View "Dynamic Segment" Report on Looker Studio](https://lookerstudio.google.com/reporting/d471800c-27fc-414d-829b-cb28f55f8751/page/TlJ0C)
+
+<img width="2032" height="1161" alt="image" src="https://github.com/user-attachments/assets/fb0bd9bd-b317-4e33-8238-bbee1ef8049c" />
