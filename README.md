@@ -152,6 +152,14 @@ We would need cart event data to see if a user is actively "building" their cart
 
 ## Part 2A: Visualization
 
+* [View "New vs Returning" Report on Looker Studio](https://lookerstudio.google.com/reporting/3502b190-8019-4d52-aa49-0b668dcc1458/page/TlJ0C)
+
+* [View "Churn vs Revenue" Report on Looker Studio](https://lookerstudio.google.com/reporting/6285b635-6eba-4728-85af-9a0e3a1df580/page/TlJ0C)
+
+* [View "Cohort Retention Heatmap" Report on Looker Studio](https://lookerstudio.google.com/reporting/d60b7725-20a7-4744-9315-07960bcfdb1e/page/TlJ0C)
+
+* [View "Dynamic Segment" Report on Looker Studio](https://lookerstudio.google.com/reporting/d471800c-27fc-414d-829b-cb28f55f8751/page/TlJ0C)
+
 -------------------------------
 
 ## Part 2B: Strategic Insights & Recommendations
