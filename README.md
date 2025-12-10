@@ -168,10 +168,10 @@ We would need cart event data to see if a user is actively "building" their cart
 *How we defined key metrics vs. how we might define them differently in other contexts.*
 
 * **Active Customer:** Defined as a user who placed **at least one completed order** (`status='Complete'` and `returned_at IS NULL`) within the reporting period.
-    * *Alternative Definition:* In a non-transactional app or environment, we could define Active based on **engagement** (e.g., "Logged in within last 30 days") rather than just purchases. This captures users who are evaluating the product but haven't converted yet.
+    * *Alternative Definition:* In a non-transactional app or environment, we could define Active based on **engagement** (e.g., "Logged in within last 30 days") rather than just purchases. This captures users who are evaluating the product but have not converted yet.
  
 * **Churned Customer:** Defined using a **3-Month Calendar Window** (Task C). A user active in Month $M$ is "churned" if they place **zero** orders in months $M+1, M+2, \text{and } M+3$.
-    * *Alternative Definition:* A **Rolling 90-Day Window** (e.g., churned if `days_since_last_order > 90`). This is more precise for triggering automated win-back emails but is harder to visualize on a monthly bar chart.
+    * *Alternative Definition:* A **Rolling 90-Day Window** (e.g., churned if `days_since_last_order > 90`). This is more precise for triggering automated win-back emails but is harder to check on a monthly chart.
 
 * **New vs. Returning:**
     * **New:** First purchase in the current month.
@@ -183,8 +183,8 @@ We would need cart event data to see if a user is actively "building" their cart
 **The "Cohort Retention Heatmap" (See Task C - Stretch)**
 
 * **The Trend:** While aggregate monthly revenue might look flat or growing, the **cohort heatmap** reveals if newer groups of customers are churning *faster* than older groups.
-* **Why it matters:** If January 2022 cohort retains at 20% but our January 2023 cohort retains at only 10%, we are "burning" through our total addressable market.
-* **Impact:** This could indicate that despite higher acquisition numbers, the "leaky bucket" is getting worse—likely due to declining quality or maybe poor customer fit from lower quality traffic sources.
+* **Why it matters:** If January 2022 cohort retains at 20% but January 2023 cohort retains at only 10%, we are "burning" through our total addressable market.
+* **Impact:** This could indicate that despite higher acquisition numbers, the retention is getting worse—likely due to declining quality or maybe poor customer fit from lower quality traffic sources.
 
 ### 3. Product Experiment Proposal
 
@@ -195,19 +195,19 @@ We would need cart event data to see if a user is actively "building" their cart
     * **Control Group:** Free shipping at $100.
     * **Variant Group:** Free shipping at $75.
 * **Success Metrics:**
-    * *Primary:* **Net Margin Impact** (Did the increase in conversion volume outweigh the incremental shipping cost?). *Critically, we do not just measure Revenue.*
+    * *Primary:* **Net Margin Impact** (Did the increase in conversion volume outweigh the incremental shipping cost?).
     * *Secondary:* Cart Abandonment Rate for the $60–$90 segment.
 
 ### 4. Product Health Dashboard
-*The 5–7 metrics I would group into a dashboard to monitor product health (AARRR Framework).*
+*The 5–7 metrics I would group into a dashboard to monitor product health (AARRR).*
 
 | Category | Metric | Why It Matters |
 | :--- | :--- | :--- |
 | **Acquisition** | **Traffic Source Mix** | Are we relying too heavily on one channel (e.g., Organic Search vs. Paid)? |
 | **Activation** | **New User AOV** | Are we acquiring "high value" users, or just cheap traffic? |
-| **Retention** | **Cohort Retention Rate (Month 3)** | The "Truth" metric. Are users sticking around after the initial hype? |
-| **Revenue** | **Net Margin** | Revenue is vanity; margin is sanity. (Revenue - COGS - Shipping). |
-| **Revenue** | **Repurchase Rate** | % of this month's buyers who are Returning (Target: >30% for healthy e-com). |
+| **Retention** | **Cohort Retention Rate (Month 3)** | Are users sticking around after the initial hype? |
+| **Revenue** | **Net Margin** | Measures profitability after deducting the direct costs of goods and shipping. (Revenue - COGS - Shipping) / Revenue. |
+| **Revenue** | **Repurchase Rate** | Perc of this month's buyers who are Returning (Target: >30% for healthy e-com). |
 | **Health** | **Return Rate %** | A spike here indicates product quality issues or "bracketing" (buying multiple sizes to return). |
 
 -------------------------------
@@ -226,8 +226,8 @@ I utilized AI tools (LLMs) primarily as a **Thought Partner** and **Syntax Accel
 >
 > **Constraint:** Ensure the query handles the 'future gap'—do not calculate churn for recent months where the full 90-day window has not yet elapsed."
 
-**How I Validated the Output (Trust but Verify):**
-I did not blindly run the code. I performed the following validation checks:
+**How I Validated the Output:**
+I did not blindly run everything. I performed the following validation checks:
 1.  **Logic "Smell Test":** I checked the `WHERE` clause to ensure it included the specific logic `activity_month < DATE_SUB(CURRENT_DATE(), INTERVAL 4 MONTH)`. Without this manual check, the AI might have returned a query showing "100% churn" for the current month, which is technically correct code but **analytically false**.
 2.  **Definition Verification:** I verified that the AI used my strict definition of "Active" (`status='Complete'`) in the `JOIN` conditions, rather than just counting *any* row in the `orders` table (which would incorrectly include returns or cancelled orders).
 3.  **Syntax check:** I reviewed the `DATE_TRUNC` and `INTERVAL` functions to ensure they matched BigQuery's specific dialect, as LLMs sometimes default to PostgreSQL syntax.
