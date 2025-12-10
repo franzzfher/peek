@@ -93,3 +93,57 @@ This task moves beyond aggregate churn rates to build a **Cohort-Based Retention
 * **Rows:** Cohort Month (e.g., Jan 2022, Feb 2022).
 * **Columns:** Months Since First Purchase (0, 1, 2, ... 12+).
 * **Values:** Retention Rate % (visualized by color intensity).
+
+-------------------------------
+
+### Task D: Product Change Impact (Scenario Analysis)
+
+**Scenario Overview**
+This task simulates an impact analysis for a hypothetical product feature launched on **2022-01-15**:
+* **Feature:** A checkout header promoting "Free shipping for orders over $100."
+* **Goal:** Evaluate the impact on Average Order Value and Revenue.
+
+**Methodology: Pre/Post Analysis**
+A/B testing data is not available in the public dataset then we use a **Pre/Post approach**:
+1.  **Define Windows:** Compare the 8 weeks *before* the launch to the 8 weeks *after*.
+    * *Pre-Launch:* `2021-11-20` to `2022-01-14`
+    * *Post-Launch:* `2022-01-15` to `2022-03-12`
+2.  **Define Proxy Segments:** We segment orders based on the value to see if users "pushed" their baskets to meet the threshold.
+    * *Eligible:* Order Total $\ge$ $100
+    * *Non-Eligible:* Order Total < $100
+3.  **Key Segments:** The query breaks down impact by `Traffic Source`, `Country`, or `Gender` to uncover hidden wins (e.g., did Email traffic respond better than Organic?).
+
+**Assumptions & Logic**
+* **Seasonality:** We assume the "Pre" period (Nov-Jan) and "Post" period (Jan-Mar) are roughly comparable, though holiday seasonality (Q4) likely skews the Pre-period baseline.
+* **Attribution:** We assume all users saw the banner, as we lack experimental assignment data.
+
+**Technical Solution: Dynamic SQL**
+To avoid generating lots of rows of messy data when grouping by every dimension at once, this query uses `EXECUTE IMMEDIATE`, which allows the analyst to **dynamically switch** between a "Global View" and a specific "Segment View" (e.g., by Traffic Source) without rewriting the code.
+
+**Missing Data**
+To perform a better impact analysis in a real-world scenario, the following sources would be required to prove causality and calculate ROI.
+
+#### 1. Experimentation (To Prove Causality)
+Relying on Pre/Post analysis allows seasonality or external marketing to skew results. To isolate the impact of the banner, we need:
+* **Experiment assignment:** A log mapping each `user_id` to a `test_group`.
+* **Exposure timestamp:** The exact moment a user saw the banner. We could filter for orders placed after this timestamp to measure a possible true change.
+
+#### 2. Financial (To Measure ROI)
+The current dataset calculates Revenue and Gross Profit, but it misses the primary cost driver of this specific promotion: shipping fees.
+* **Shipping cost:** The amount the company pays the carrier to ship the package.
+* **Shipping revenue:** The amount the customer paid for shipping.
+
+> **Why it matters:** If Average Order Value increases by $5, but the company pays $8 to ship, the promotion actually *loses* money.
+
+#### 3. Behavioral Funnel
+We would need cart event data to see if a user is actively "building" their carts to reach the threshold.
+* **Cart event logs:** Timestamps of `add_to_cart` actions.
+* **Cart value at checkout:** A snapshot of the total cart value immediately before the purchase was finalized.
+
+> **Why it matters:** This helps identify **"Cart stuffing"**—users adding low-value (possibly filler) items just to cross the $100 threshold. This behavior differs significantly from upselling affecting long-term value.
+
+#### 4. Qualitative & Operational Data
+* **User sentiment:** Survey data to understand if a customer perceived the $100 threshold as valuable or too high.
+* **Return reasons:** Data distinguishing between "Did not fit" vs. "Ordered to get the promo." High return rates from some users can destroy the profitability of free shipping promos.
+
+
