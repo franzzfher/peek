@@ -249,7 +249,7 @@ DECLARE launch_date DATE DEFAULT '2022-01-15';
 DECLARE window_days INT64 DEFAULT 56;
 
 -- Change this to switch views:
--- Option A (Segmented): 'u.traffic_source'
+-- Option A (Segmented): 'c.traffic_source'
 -- Option B (Global):    "'Global'" 
 DECLARE key_segment_col STRING DEFAULT "'Global'"; 
 
