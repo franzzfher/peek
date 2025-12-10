@@ -8,3 +8,7 @@
 
 <img width="2032" height="1161" alt="image" src="https://github.com/user-attachments/assets/d34bc3a9-4ada-453c-ba89-53bae27aba07" />
 
+* [View "Cohort Retention Heatmap" Report on Looker Studio](https://lookerstudio.google.com/reporting/d60b7725-20a7-4744-9315-07960bcfdb1e/page/TlJ0C)
+
+<img width="2032" height="1161" alt="image" src="https://github.com/user-attachments/assets/ade824ac-7213-46a9-be61-8df98f68ba5b" />
+
