@@ -4,4 +4,4 @@
 
 * <img width="2032" height="1161" alt="image" src="https://github.com/user-attachments/assets/7f9d0a37-666d-4ad9-a7ab-e0df2ac568a1" />
 
-
+* [View "Churn vs Revenue" Report on Looker Studio](https://lookerstudio.google.com/reporting/6285b635-6eba-4728-85af-9a0e3a1df580/page/TlJ0C)
