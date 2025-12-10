@@ -1,5 +1,7 @@
 # PEEK
 
+## Part 1: SQL
+
 ### Task A: Monthly Financials
 
 **Overview**
@@ -146,4 +148,78 @@ We would need cart event data to see if a user is actively "building" their cart
 * **User sentiment:** Survey data to understand if a customer perceived the $100 threshold as valuable or too high.
 * **Return reasons:** Data distinguishing between "Did not fit" vs. "Ordered to get the promo." High return rates from some users can destroy the profitability of free shipping promos.
 
+-------------------------------
 
+## Part 2A: Visualization
+
+-------------------------------
+
+## Part 2B: Strategic Insights & Recommendations
+
+### 1. Definitions & Alternatives
+*How we defined key metrics vs. how we might define them differently in other contexts.*
+
+* **Active Customer:** Defined as a user who placed **at least one completed order** (`status='Complete'` and `returned_at IS NULL`) within the reporting period.
+    * *Alternative Definition:* In a non-transactional app or environment, we could define Active based on **engagement** (e.g., "Logged in within last 30 days") rather than just purchases. This captures users who are evaluating the product but haven't converted yet.
+ 
+* **Churned Customer:** Defined using a **3-Month Calendar Window** (Task C). A user active in Month $M$ is "churned" if they place **zero** orders in months $M+1, M+2, \text{and } M+3$.
+    * *Alternative Definition:* A **Rolling 90-Day Window** (e.g., churned if `days_since_last_order > 90`). This is more precise for triggering automated win-back emails but is harder to visualize on a monthly bar chart.
+
+* **New vs. Returning:**
+    * **New:** First purchase in the current month.
+    * **Returning:** Active in current month, but first purchase was in a prior month.
+    * *Alternative Definition:* We could add a **"Resurrected"** metric. Users who were inactive for >6 months and then returned. Treating them simply as "Returning" masks the effectiveness of specific campaigns.
+
+### 2. Most Important Trend for Leadership
+
+**The "Cohort Retention Heatmap" (See Task C - Stretch)**
+
+* **The Trend:** While aggregate monthly revenue might look flat or growing, the **cohort heatmap** reveals if newer groups of customers are churning *faster* than older groups.
+* **Why it matters:** If January 2022 cohort retains at 20% but our January 2023 cohort retains at only 10%, we are "burning" through our total addressable market.
+* **Impact:** This could indicate that despite higher acquisition numbers, the "leaky bucket" is getting worse—likely due to declining quality or maybe poor customer fit from lower quality traffic sources.
+
+### 3. Product Experiment Proposal
+
+**The Experiment:** Dynamic Free Shipping Threshold (Building on Task D)
+* **Hypothesis:** The hypothetical $100 threshold analyzed in Task D might be too high for mid-tier users, causing cart abandonment.
+* **Target Segment:** Users with a "Cart Value" between **$60 and $90** (High intent, but below the current $100 gap).
+* **The Test:**
+    * **Control Group:** Free shipping at $100.
+    * **Variant Group:** Free shipping at $75.
+* **Success Metrics:**
+    * *Primary:* **Net Margin Impact** (Did the increase in conversion volume outweigh the incremental shipping cost?). *Critically, we do not just measure Revenue.*
+    * *Secondary:* Cart Abandonment Rate for the $60–$90 segment.
+
+### 4. Product Health Dashboard
+*The 5–7 metrics I would group into a dashboard to monitor product health (AARRR Framework).*
+
+| Category | Metric | Why It Matters |
+| :--- | :--- | :--- |
+| **Acquisition** | **Traffic Source Mix** | Are we relying too heavily on one channel (e.g., Organic Search vs. Paid)? |
+| **Activation** | **New User AOV** | Are we acquiring "high value" users, or just cheap traffic? |
+| **Retention** | **Cohort Retention Rate (Month 3)** | The "Truth" metric. Are users sticking around after the initial hype? |
+| **Revenue** | **Net Margin** | Revenue is vanity; margin is sanity. (Revenue - COGS - Shipping). |
+| **Revenue** | **Repurchase Rate** | % of this month's buyers who are Returning (Target: >30% for healthy e-com). |
+| **Health** | **Return Rate %** | A spike here indicates product quality issues or "bracketing" (buying multiple sizes to return). |
+
+-------------------------------
+
+## Part 3: AI & Analytics
+
+### How I used AI in this challenge
+I utilized AI tools (LLMs) primarily as a **Thought Partner** and **Syntax Accelerator** rather than a "Solution Generator."
+* **Strategy Refinement:** I used AI to brainstorm potential edge cases in my churn logic (e.g., "How do we handle the most recent months where the 90-day window hasn't closed yet?").
+* **Documentation Formatting:** I used AI to convert raw SQL comments into professional, readable Markdown tables and "Technical Spec" sections for the README.
+* **Dynamic SQL Construction:** I used AI to help structure the complex `EXECUTE IMMEDIATE` syntax for the dynamic segment analysis in Task D, which is error-prone to write from scratch.
+
+### Example Prompt & Validation
+**The Prompt Used:**
+> "Write a BigQuery SQL query to calculate a 90-day churn rate. The logic should be: User is active in Month M, and Churned if they have 0 completed orders in the window [M+1, M+3].
+>
+> **Constraint:** Ensure the query handles the 'future gap'—do not calculate churn for recent months where the full 90-day window has not yet elapsed."
+
+**How I Validated the Output (Trust but Verify):**
+I did not blindly run the code. I performed the following validation checks:
+1.  **Logic "Smell Test":** I checked the `WHERE` clause to ensure it included the specific logic `activity_month < DATE_SUB(CURRENT_DATE(), INTERVAL 4 MONTH)`. Without this manual check, the AI might have returned a query showing "100% churn" for the current month, which is technically correct code but **analytically false**.
+2.  **Definition Verification:** I verified that the AI used my strict definition of "Active" (`status='Complete'`) in the `JOIN` conditions, rather than just counting *any* row in the `orders` table (which would incorrectly include returns or cancelled orders).
+3.  **Syntax check:** I reviewed the `DATE_TRUNC` and `INTERVAL` functions to ensure they matched BigQuery's specific dialect, as LLMs sometimes default to PostgreSQL syntax.
